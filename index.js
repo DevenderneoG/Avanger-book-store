@@ -81,32 +81,35 @@ app.delete("/books/:bookId", async (req, res) => {
 })
 
 
-// readAllHotels();
+async function bookReadUpdate(bookId, dataToUpdate) {
+  try {
+    const updatedBook = await BookStore.findByIdAndUpdate(
+      bookId,
+      { $set: { isRead: dataToUpdate.isRead } }, 
+      { new: true }
+    );
+    return updatedBook;
+  } catch (error) {
+    console.error("Error in updating Book data:", error);
+    throw error;
+  }
+}
 
-// async function hotelUpdate(hotelId, dataToUpdate) {
-//   try {
-//     const updatedHotel = await Hotels.findByIdAndUpdate(hotelId, dataToUpdate, {new: true})
-//     return updatedHotel;
-//   } catch (error) {
-//     console.log("Error in updating Hotel data", error)
-//   }
-// }
-
-// app.post("/hotels/:hotelId", async (req, res) => {
-//   try {
-//     const hotelUpdatedById = await hotelUpdate(req.params.hotelId, req.body);
-//     if(hotelUpdatedById) {
-//       res.status(200).json({message: "Hotel updated successfully.", hotelUpdatedById: hotelUpdatedById});
-//     } else {
-//       res.status(404).json({message: "Hotel not found."});
-//     }
-//   } catch (error) {
-//     res.status(500).json({ error: "Failed to update Hotel." });
-//   }
-// })
-
-// hotelUpdate("671f74d2f145e1b243c3bf0f", {checkOutTime: "11:00 AM"})
-
+app.patch("/books/:bookId/toggle-read", async (req, res) => {
+  try {
+    const bookUpdatedById = await bookReadUpdate(req.params.bookId, req.body);
+    if (bookUpdatedById) {
+      res.status(200).json({
+        message: "Book read status updated successfully.",
+        bookUpdatedById,
+      });
+    } else {
+      res.status(404).json({ message: "Book not found." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update book read status." });
+  }
+});
 
 
 
